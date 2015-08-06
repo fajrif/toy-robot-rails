@@ -1,0 +1,29 @@
+<%= form_for(@robot, url: command_robots_path) do |f| %>
+  <% if @robot.errors.any? %>
+  <ul>
+    <% @robot.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+  </ul>
+  <% end %>
+  <div class="field">
+    <%= f.select :first_command, options_for_select(['PLACE']), prompt: '-- First command --' %>
+  </div>
+  <div class="field">
+    <%= f.text_field :x_coordinate, placeholder: 'X-coordinate' %>
+  </div>
+  <div class="field">
+    <%= f.text_field :y_coordinate, placeholder: 'Y-coordinate' %>
+  </div>
+  <div class="field">
+    <%= f.select :facing, options_for_select(['NORTH','WEST','SOUTH','EAST'], (params[:robot][:facing] if params[:robot])), prompt: '-- Facing --' %>
+  </div>
+  <div class="field">
+    <%= f.text_field :commands, placeholder: 'Commands' %>
+    ( commands available: [ MOVE | LEFT | RIGHT | REPORT ] - whitespace delimited )
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Submit' %>
+  </div>
+<% end %>

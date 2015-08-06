@@ -1,0 +1,19 @@
+== Toy Robot Simulator
+
+This is the first attempt to build a small Rails application to command a toy robot with given inputs.
+
+=== Ruby version
+
+2.1
+
+=== Rails version
+
+4.0.4
+
+=== How to run the test suite
+
+bundle exec rspec OR bundle exec rake
+
+=== How to run the Rails application
+
+rails server ( default: localhost:3000 )
