@@ -57,9 +57,6 @@ GEM
     rack (1.5.5)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rack-webconsole (0.1.2)
-      json
-      rack
     rails (4.0.4)
       actionmailer (= 4.0.4)
       actionpack (= 4.0.4)
@@ -131,7 +128,6 @@ DEPENDENCIES
   hashie
   jbuilder (~> 1.2)
   jquery-rails
-  rack-webconsole
   rails (= 4.0.4)
   rspec-rails
   sass-rails (~> 4.0.2)

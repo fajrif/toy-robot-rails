@@ -1,70 +1,89 @@
 class Robot
   include ActiveModel::Model
 
-  attr_accessor :first_command, :x_coordinate, :y_coordinate, :facing, :commands
+  attr_accessor :size_grid, :x, :y, :f, :commands, :report
 
   def initialize(params={})
-    @first_command = params[:first_command]
-    @x_coordinate = params[:x_coordinate]
-    @y_coordinate = params[:y_coordinate]
-    @facing = params[:facing]
+    @size_grid = params[:size_grid] || "5x5"
+    @x = params[:x]
+    @y = params[:y]
+    @f = params[:f]
     @commands = params[:commands]
+    @report = nil
   end
 
-  def report
-    output = result
-    output if @first_command.eql?('PLACE') && output.present?
+  def execute_commands!
+    commands = @commands.gsub(/\r\n/,' ')
+    commands = commands.to_s.upcase.split(' ')
+    commands.each_with_index do |command, index|
+      case command
+      when 'PLACE'
+        placing_initial_coordinates(commands[index+1])
+      when 'MOVE'
+        move_into_new_position
+      when 'LEFT'
+        change_direction('LEFT')
+      when 'RIGHT'
+        change_direction('RIGHT')
+      when 'REPORT'
+        generate_report
+        break
+      end
+    end
   end
 
   private
 
-    def result
-      commands = @commands.to_s.upcase.split(' ')
-      commands.each do |command|
-        case command
-        when 'MOVE'
-          calculate_coordinates
-        when 'LEFT'
-          determine_facing('LEFT')
-        when 'RIGHT'
-          determine_facing('RIGHT')
-        when 'REPORT'
-          @result = "#{@x_coordinate},#{@y_coordinate},#{@facing}"
-          break
+    def placing_initial_coordinates(args)
+      @x, @y, @f = args.split(',')
+    end
+
+    def move_into_new_position
+      _max_x, _max_y = @size_grid.split('x').map(&:to_i)
+      @x = @x.to_i
+      @y = @y.to_i
+      case @f
+      when 'NORTH'
+        @y = @y+1
+        if @y > _max_y
+          @y = @y-1; warning!
+        end
+      when 'WEST'
+        @x = @x-1
+        if @x < 0
+          @x = @x+1; warning!
+        end
+      when 'SOUTH'
+        @y = @y-1
+        if @y < 0
+          @y = @y+1; warning!
+        end
+      when 'EAST'
+        @x = @x+1
+        if @x > _max_x
+          @x = @x-1; warning!
         end
       end
-      @result ? @result : ''
     end
 
-    def calculate_coordinates
-      @x_coordinate = @x_coordinate.to_i
-      @y_coordinate = @y_coordinate.to_i
-      case @facing
+    def change_direction(direction)
+      case @f
       when 'NORTH'
-        @y_coordinate = @y_coordinate+1
-        @y_coordinate = @y_coordinate-1 if @y_coordinate > 4
+        @f = direction.eql?('LEFT') ? 'EAST' : 'WEST'
       when 'WEST'
-        @x_coordinate = @x_coordinate-1
-        @x_coordinate = @x_coordinate+1 if @x_coordinate < 0
+        @f = direction.eql?('LEFT') ? 'NORTH' : 'SOUTH'
       when 'SOUTH'
-        @y_coordinate = @y_coordinate-1
-        @y_coordinate = @y_coordinate+1 if @y_coordinate < 0
+        @f = direction.eql?('LEFT') ? 'WEST' : 'EAST'
       when 'EAST'
-        @x_coordinate = @x_coordinate+1
-        @x_coordinate = @x_coordinate-1 if @x_coordinate > 4
+        @f = direction.eql?('LEFT') ? 'SOUTH' : 'NORTH'
       end
     end
 
-    def determine_facing(direction)
-      case @facing
-      when 'NORTH'
-        @facing = direction.eql?('LEFT') ? 'WEST' : 'EAST'
-      when 'WEST'
-        @facing = direction.eql?('LEFT') ? 'SOUTH' : 'NORTH'
-      when 'SOUTH'
-        @facing = direction.eql?('LEFT') ? 'WEST' : 'EAST'
-      when 'EAST'
-        @facing = direction.eql?('LEFT') ? 'NORTH' : 'SOUTH'
-      end
+    def generate_report
+      @report = @x && @y && @f ? "#{@x},#{@y},#{@f}" : "You need to place the robot first"
+    end
+
+    def warning!
+      errors.add(:warning, 'Your robot is on the edge of the cliff')
     end
 end

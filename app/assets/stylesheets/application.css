@@ -11,3 +11,17 @@
  *= require_self
  *= require_tree .
  */
+
+.field {
+  padding: 10px;
+}
+
+#command {
+    font-size: 1em;
+}
+#error {
+    color: #FF0000;
+}
+#report {
+    color: #0892d0;
+}

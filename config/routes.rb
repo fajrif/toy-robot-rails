@@ -1,15 +1,11 @@
 ToyRobotSimulator::Application.routes.draw do
-  resources :robots, only: [:index, :new] do
-    collection do
-      post 'command'
-    end
-  end
+  resources :robots, only: [:new,:create]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
   # You can have the root of your site routed with "root"
-  root 'robots#index'
+  root 'robots#new'
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

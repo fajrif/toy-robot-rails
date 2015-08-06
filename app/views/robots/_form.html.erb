@@ -1,29 +1,46 @@
-<%= form_for(@robot, url: command_robots_path) do |f| %>
+<%= form_for(@robot, url: robots_path) do |f| %>
   <% if @robot.errors.any? %>
-  <ul>
+    <ul>
     <% @robot.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
+      <li><b style="color:orange"><%= msg %></b></li>
+  <% end %>
   </ul>
   <% end %>
-  <div class="field">
-    <%= f.select :first_command, options_for_select(['PLACE']), prompt: '-- First command --' %>
-  </div>
-  <div class="field">
-    <%= f.text_field :x_coordinate, placeholder: 'X-coordinate' %>
-  </div>
-  <div class="field">
-    <%= f.text_field :y_coordinate, placeholder: 'Y-coordinate' %>
-  </div>
-  <div class="field">
-    <%= f.select :facing, options_for_select(['NORTH','WEST','SOUTH','EAST'], (params[:robot][:facing] if params[:robot])), prompt: '-- Facing --' %>
-  </div>
-  <div class="field">
-    <%= f.text_field :commands, placeholder: 'Commands' %>
-    ( commands available: [ MOVE | LEFT | RIGHT | REPORT ] - whitespace delimited )
-  </div>
+  <table>
+    <tr>
+      <td colspan="2">
+        <div class="field">
+          <%= f.label :size_grid %>
+          <%= f.text_field :size_grid, placeholder: 'Size Grid', style: "width:50px" %>
+          <i>Type size of the Grid default: 5x5</i>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="field">
+          <%= f.label :commands %><br/>
+          <%= f.text_area :commands, placeholder: 'Commands', style: "width:350px;height:150px" %>
+          <p style="width:400px"><i>Type commands available: [ PLACE X,Y,( NORTH | WEST | SOUTH | EAST ) | MOVE | LEFT | RIGHT | REPORT ] - whitespace delimited</i></p>
+          <b><%= "Output: #{@robot.report}" if @robot.report %></b>
+        </div>
+      </td>
+      <td>
+        <p>
+          <b>Shortcut for navigations:</b><br/>
+          <b>Ctrl+Shift+N : MOVE NORTH</b><br/>
+          <b>Ctrl+Shift+W : MOVE WEST</b><br/>
+          <b>Ctrl+Shift+S : MOVE SOUTH</b><br/>
+          <b>Ctrl+Shift+E : MOVE EAST</b><br/>
+        </p>
+        <%= f.hidden_field :x %>
+        <%= f.hidden_field :y %>
+        <%= f.hidden_field :f %>
+      </td>
+    </tr>
+  </table>
 
-  <div class="actions">
-    <%= f.submit 'Submit' %>
+  <div class="field">
+    <%= f.submit 'Post Commands' %>
   </div>
 <% end %>
