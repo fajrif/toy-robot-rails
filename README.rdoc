@@ -4,7 +4,7 @@ This is the first attempt to build a small Rails application to command a toy ro
 
 === Ruby version
 
-2.1
+2.2.2
 
 === Rails version
 
@@ -12,8 +12,8 @@ This is the first attempt to build a small Rails application to command a toy ro
 
 === How to run the test suite
 
-bundle exec rspec OR bundle exec rake
+bundle exec rspec
 
-=== How to run the Rails application
+=== How to run the this application
 
 rails server ( default: localhost:3000 )
