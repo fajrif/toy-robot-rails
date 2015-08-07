@@ -6,10 +6,10 @@ class Robot
   def initialize(params={})
     @x = params[:x].try(:to_i)
     @y = params[:y].try(:to_i)
-    @f = params[:f]
+    @f = params[:f] || ""
     @size_grid = sanitize_size(params[:size_grid])
     @max_x, @max_y = @size_grid.split('x').map(&:to_i)
-    @commands = params[:commands]
+    @commands = params[:commands] || ""
     @report = nil
   end
 

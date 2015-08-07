@@ -1,104 +1,89 @@
 require 'spec_helper'
 
-# The tests are based on the Toy Robot Simulator examples
 describe Robot do
-  describe "#report" do
-    context "when no inputs given" do
-      let(:inputs) do
+  describe "Initialize robot" do
+    context "when no params given" do
+      let(:params) do
         Hashie::Mash.new(
           {
-            first_command: '',
-            x_coordinate: 0,
-            y_coordinate: 0,
-            facing: '',
             commands: ''
           }
         )
       end
 
-      subject { Robot.new(inputs) }
+      subject { Robot.new(params) }
 
       it "returns nil" do
         expect(subject.report).to eq(nil)
+        expect(subject.size_grid).to eq("5x5")
       end
     end
 
-    context "when out of boundary" do
-      let(:inputs) do
+    context "when commands given without PLACE" do
+      let(:params) do
         Hashie::Mash.new(
           {
-            first_command: 'PLACE',
-            x_coordinate: 0,
-            y_coordinate: 0,
-            facing: 'NORTH',
             commands: 'LEFT MOVE REPORT'
           }
         )
       end
 
-      subject { Robot.new(inputs) }
+      subject { Robot.new(params) }
 
-      it "returns 0,0,WEST" do
-        expect(subject.report).to eq('0,0,WEST')
+      it "returns NOTHING" do
+        subject.execute_commands!
+        expect(subject.errors.count).to eq(1)
+        expect(subject.report).to eq(nil)
       end
     end
 
     context "PLACE 0,0,NORTH with MOVE" do
-      let(:inputs) do
+      let(:params) do
         Hashie::Mash.new(
           {
-            first_command: 'PLACE',
-            x_coordinate: 0,
-            y_coordinate: 0,
-            facing: 'NORTH',
-            commands: 'MOVE REPORT'
+            commands: 'PLACE 0,0,NORTH MOVE REPORT'
           }
         )
       end
 
-      subject { Robot.new(inputs) }
+      subject { Robot.new(params) }
 
       it "returns 0,1,North" do
+        subject.execute_commands!
         expect(subject.report).to eq('0,1,NORTH')
       end
     end
 
     context "PLACE 0,0,NORTH with LEFT" do
-      let(:inputs) do
+      let(:params) do
         Hashie::Mash.new(
           {
-            first_command: 'PLACE',
-            x_coordinate: 0,
-            y_coordinate: 0,
-            facing: 'NORTH',
-            commands: 'LEFT REPORT'
+            commands: 'PLACE 0,0,NORTH with LEFT REPORT'
           }
         )
       end
 
-      subject { Robot.new(inputs) }
+      subject { Robot.new(params) }
 
       it "returns 0,0,West" do
+        subject.execute_commands!
         expect(subject.report).to eq('0,0,WEST')
       end
     end
 
     context "PLACE 1,2,EAST with MOVE MOVE LEFT MOVE" do
-      let(:inputs) do
+      let(:params) do
         Hashie::Mash.new(
           {
-            first_command: 'PLACE',
-            x_coordinate: 1,
-            y_coordinate: 2,
-            facing: 'EAST',
-            commands: 'MOVE MOVE LEFT MOVE REPORT'
+            commands: 'PLACE 1,2,EAST with MOVE MOVE LEFT MOVE REPORT'
           }
         )
       end
 
-      subject { Robot.new(inputs) }
+      subject { Robot.new(params) }
 
       it "returns 3,3,NORTH" do
+        subject.execute_commands!
         expect(subject.report).to eq('3,3,NORTH')
       end
     end
