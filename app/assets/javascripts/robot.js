@@ -1,242 +1,91 @@
-var commandInitiated;
-var errorMessage;
-var reportMessage;
+function drawDirections(context, axisX, axisY, direction) {
+  axisX = axisX - 10;
+  axisY = axisY - 5;
 
-var facing;
-var maxX;
-var maxY;
+  context.lineWidth = 1;
+  context.fillStyle = "#f88f32";
+  context.beginPath();
 
-var robot;
-var currentPos;
+  switch (direction) {
+    case 'NORTH':
+      context.save();
+      context.translate(10 - 3 + axisX+2, 10 - (3 + 5) + axisY);
+      context.rotate(Math.PI);
+      context.translate(-(10 - 3 + axisX+5),-(10 - (3 + 5) + axisY+10));
+      break;
+    case 'EAST':
+      context.save();
+      context.translate(10 - 3 + axisX+5, 10 - (3 + 5) + axisY);
+      context.rotate(-Math.PI/2);
+      context.translate(-(10 - 3 + axisX+5),-(10 - (3 + 5) + axisY+10));
+      break;
+    case 'WEST':
+      context.save();
+      context.translate(10 - 3 + axisX+2, 10 - (3 + 5) + axisY+5);
+      context.rotate(Math.PI/2);
+      context.translate(-(10 - 3 + axisX+5),-(10 - (3 + 5) + axisY+10));
+      break;
+    default:
+      // this will be SOUTH
+      break;
+  }
 
-var canvas;
-var context;
-
-function writeError(msg) {
-    errorMessage.innerHTML = msg;
+  context.moveTo(10 - 3 + axisX, 10 - (3 + 5) + axisY);
+  context.lineTo(10 + 3 + axisX, 10 - (3 + 5) + axisY);
+  context.lineTo(10 + 3 + axisX, 10 - (3 - 5) + axisY);
+  context.lineTo(10 + 7 + axisX, 10 - (3 - 5) + axisY);
+  context.lineTo(10 + 0 + axisX, 10 - (3 - 13) + axisY);
+  context.lineTo(10 - 7 + axisX, 10 - (3 - 5) + axisY);
+  context.lineTo(10 - 3 + axisX, 10 - (3 - 5) + axisY);
+  context.lineTo(10 - 3 + axisX, 10 - (3 + 5) + axisY);
+  context.fill();
 }
 
-function validX(axis) {
-    if (isNaN(axis)) {
-        writeError("Please enter a numeric X coordinates!");
-        return false;
-    } else if (axis < 0 || axis > maxX) {
-        writeError("X coordinates out of range!");
-        return false;
-    } else {
-        return true;
+function Board(max_x, max_y) {
+  this.max_x = max_x;
+  this.max_y = max_y;
+  this.max_x_coordinate = (max_x * 100) + 50;
+  this.max_y_coordinate = (max_y * 100) + 50;
+  this.draw = function (context) {
+    // drawing y line
+    for (var x = 50; x < this.max_x_coordinate + 100; x += 100) {
+        context.moveTo(x, 50);
+        context.lineTo(x, this.max_y_coordinate);
     }
-}
 
-function validY(axis) {
-    if (isNaN(axis)) {
-        writeError("Please enter a numeric Y coordinates!");
-        return false;
-    } else if (axis < 0 || axis > maxY) {
-        writeError("Y coordinates out of range!");
-        return false;
-    } else {
-        return true;
+    // drawing x line
+    for (var y = 50; y < this.max_y_coordinate + 100; y += 100) {
+        context.moveTo(50, y);
+        context.lineTo(this.max_x_coordinate, y);
     }
-}
 
-function validF(face) {
-    if (facing.indexOf(face) === -1) {
-        writeError("Wrong facing!");
-        return false;
-    } else {
-        return true;
-    }
+    context.strokeStyle = "#000";
+    context.stroke();
+  }
 }
 
 function Robot(x, y, f) {
     this.x = x;
     this.y = y;
     this.f = f;
-}
-
-function place(posCmd) {
-    var newPos = posCmd.split(","); // get x y f from the command
-    var newX = parseInt(newPos[0].trim());
-    var newY = parseInt(newPos[1].trim());
-    var newF = newPos[2].trim().toUpperCase();
-    if (validX(newX) && validY(newY) && validF(newF)) {
-        robot.x = newX;
-        robot.y = newY;
-        robot.f = newF;
-        drawRobot(robot);
+    this.draw = function(context,board) {
+      context.beginPath();
+      var axisX = (this.x + 1) * 100;
+      var axisY = (board.max_y - this.y) * 100;
+      context.arc(axisX, axisY, 35, 0, 2 * Math.PI);
+      context.stroke();
+      drawDirections(context, axisX, axisY, this.f)
     }
-}
-
-function move() {
-    switch (currentPos.f) {
-        case "NORTH":
-            var newY = currentPos.y + 1;
-            if (validY(newY)) {
-                robot.y = newY;
-                drawRobot(robot);
-            }
-            break;
-        case "SOUTH":
-            var newY = currentPos.y - 1;
-            if (validY(newY)) {
-                robot.y = newY;
-                drawRobot(robot);
-            }
-            break;
-        case "EAST":
-            var newX = currentPos.x + 1;
-            if (validX(newX)) {
-                robot.x = newX;
-                drawRobot(robot);
-            }
-            break;
-        case "WEST":
-            var newX = currentPos.x - 1;
-            if (validX(newX)) {
-                robot.x = newX;
-                drawRobot(robot);
-            }
-            break;
-        default:
-            break;
-    }
-}
-
-function rotate(direction) {
-    if (direction === "left") {
-        switch (currentPos.f) {
-            case "NORTH":
-                robot.f = "WEST";
-                break;
-            case "SOUTH":
-                robot.f = "EAST";
-                break;
-            case "EAST":
-                robot.f = "NORTH";
-                break;
-            case "WEST":
-                robot.f = "SOUTH";
-                break;
-            default:
-                break;
-        }
-    } else if (direction === "right") {
-        switch (currentPos.f) {
-            case "NORTH":
-                robot.f = "EAST";
-                break;
-            case "SOUTH":
-                robot.f = "WEST";
-                break;
-            case "EAST":
-                robot.f = "SOUTH";
-                break;
-            case "WEST":
-                robot.f = "NORTH";
-                break;
-            default:
-                break;
-        }
-    }
-}
-
-function report() {
-    reportMessage.innerHTML = robot.x + "," + robot.y + "," + robot.f;
-}
-
-function processCommand(command) {
-    console.log(command);
-    writeError(""); // clear error message
-
-    currentPos = {
-        x: robot.x,
-        y: robot.y,
-        f: robot.f
-    };
-    var completeCmd = command.split(" ");
-    var literalCmd = completeCmd[0].toUpperCase(); // get either PLACE, MOVE, LETF, RIGHT, REPORT or soemthing else
-
-    if (commandInitiated) {
-        switchLiteralCommand(literalCmd, completeCmd);
-    } else if ((!commandInitiated && literalCmd === 'PLACE')) {
-        commandInitiated = true;
-        var posCmd = completeCmd.slice(1).join(""); // avoid scenarios when user types extra spaces after coordinates e.g. place 2, 2,  north
-        place(posCmd);
-    } else {
-        writeError("The first valid command to the robot must be a PLACE command!");
-    }
-}
-
-function switchLiteralCommand(literalCmd, completeCmd) {
-    switch (literalCmd) {
-        case "PLACE":
-            var posCmd = completeCmd.slice(1).join(""); // avoid scenarios when user types extra spaces after coordinates e.g. place 2, 2,  north
-            place(posCmd);
-            break;
-        case "MOVE":
-            move();
-            break;
-        case "LEFT":
-            rotate("left");
-            break;
-        case "RIGHT":
-            rotate("right");
-            break;
-        case "REPORT":
-            report();
-            break;
-        default:
-            writeError("Invalid command!");
-            break;
-    }
-
-}
-
-function clearCurrentRobot(currentX, currentY) {
-    var axisX = currentX * 100 + 51;
-    var axisY = (5 - currentY) * 100 - 49;
-    context.clearRect(axisX, axisY, 98, 98);
-}
-
-function drawRobot(newRobot) {
-    clearCurrentRobot(currentPos.x, currentPos.y); // clear the current robot first
-    context.beginPath();
-    var axisX = (newRobot.x + 1) * 100;
-    var axisY = (5 - newRobot.y) * 100;
-    context.arc(axisX, axisY, 35, 0, 2 * Math.PI);
-    context.stroke();
 }
 
 function init() {
-    commandInitiated = false;
-    errorMessage = document.getElementById("error");
-    reportMessage = document.getElementById("report");
+    var canvas = document.getElementById("myCanvas");
+    var context = canvas.getContext("2d");
 
-    facing = ['NORTH', 'SOUTH', 'EAST', 'WEST'];
-    maxX = 4;
-    maxY = 4;
+    var board = new Board(parseInt($("#robot_max_x").val()), parseInt($("#robot_max_y").val()));
+    var robot = new Robot(parseInt($("#robot_x").val()), parseInt($("#robot_y").val()), $("#robot_f").val());
 
-    robot = null;
-    currentPos = {};
-
-    canvas = document.getElementById("myCanvas");
-    context = canvas.getContext("2d");
-
-    for (var x = 50; x < 650; x += 100) {
-        context.moveTo(x, 50);
-        context.lineTo(x, 550);
-    }
-
-    for (var y = 50; y < 650; y += 100) {
-        context.moveTo(50, y);
-        context.lineTo(550, y);
-    }
-
-    context.strokeStyle = "#000";
-    context.stroke();
-
-    robot = new Robot(0, 0, "NORTH");
-    drawRobot(robot);
+    board.draw(context);
+    robot.draw(context, board);
 }
 

@@ -9,25 +9,3 @@ class RobotsController < ApplicationController
     render :new
   end
 end
-
-# Create single page that accepts text commands in text area
-#
-# Mocks:
-# Toy Robot Simulator
-#
-# Grid size | 5x5 |
-#
-# |======================|    Ctrl+Shift+N : NORTH
-# |                      |    Ctrl+Shift+S : SOUTH
-# |                      |    Ctrl+Shift+W : WEST
-# |                      |    Ctrl+Shift+E : EAST
-# |                      |
-# |                      |
-# |                      |
-# |======================|
-# WARNING Message / REPORT Message
-#
-# |--------------|
-# | Post Command |
-# |--------------|
-#
