@@ -1,3 +1,5 @@
+var robot = null;
+
 function drawDirections(context, axisX, axisY, direction) {
   axisX = axisX - 10;
   axisY = axisY - 5;
@@ -76,14 +78,86 @@ function Robot(x, y, f) {
       context.stroke();
       drawDirections(context, axisX, axisY, this.f)
     }
+
+    this.moveTo = function(direction) {
+      var commands = "";
+      switch (this.f) {
+        case 'WEST':
+          switch (direction) {
+            case 'NORTH':
+              commands="RIGHT MOVE";
+              break;
+            case 'EAST':
+              commands="RIGHT RIGHT MOVE";
+              break;
+            case 'SOUTH':
+              commands="LEFT MOVE";
+              break;
+            default:
+              commands="MOVE";
+          }
+          break;
+
+        case 'NORTH':
+          switch (direction) {
+            case 'EAST':
+              commands="RIGHT MOVE";
+              break;
+            case 'SOUTH':
+              commands="RIGHT RIGHT MOVE";
+              break;
+            case 'WEST':
+              commands="LEFT MOVE";
+              break;
+            default:
+              commands="MOVE";
+          }
+          break;
+
+        case 'EAST':
+          switch (direction) {
+            case 'SOUTH':
+              commands="RIGHT MOVE";
+              break;
+            case 'WEST':
+              commands="RIGHT RIGHT MOVE";
+              break;
+            case 'NORTH':
+              commands="LEFT MOVE";
+              break;
+            default:
+              commands="MOVE";
+          }
+          break;
+
+        case 'SOUTH':
+          switch (direction) {
+            case 'WEST':
+              commands="RIGHT MOVE";
+              break;
+            case 'NORTH':
+              commands="RIGHT RIGHT MOVE";
+              break;
+            case 'EAST':
+              commands="LEFT MOVE";
+              break;
+            default:
+              commands="MOVE";
+          }
+          break;
+
+      }
+      $("#robot_commands").val(commands);
+      $('input[type="submit"]').trigger('click');
+    }
 }
 
-function init() {
+function initDrawingBoardAndRobot() {
     var canvas = document.getElementById("myCanvas");
     var context = canvas.getContext("2d");
 
     var board = new Board(parseInt($("#robot_max_x").val()), parseInt($("#robot_max_y").val()));
-    var robot = new Robot(parseInt($("#robot_x").val()), parseInt($("#robot_y").val()), $("#robot_f").val());
+    robot = new Robot(parseInt($("#robot_x").val()), parseInt($("#robot_y").val()), $("#robot_f").val());
 
     board.draw(context);
     robot.draw(context, board);

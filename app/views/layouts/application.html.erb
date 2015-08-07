@@ -11,15 +11,15 @@
 
 <%= yield %>
 
+<!-- ensure canvas was loaded -->
 <%= javascript_include_tag "robot" %>
 <script type="text/javascript" charset="utf-8">
   $( document ).ready(function() {
-    console.log( "ready!" );
-    init();
-    shortcut.add("Ctrl+Shift+N",function() {alert("Send MOVE NORTH");});
-    shortcut.add("Ctrl+Shift+S",function() {alert("Send MOVE SOUTH");});
-    shortcut.add("Ctrl+Shift+W",function() {alert("Send MOVE WEST");});
-    shortcut.add("Ctrl+Shift+E",function() {alert("Send MOVE EAST");});
+    initDrawingBoardAndRobot();
+    shortcut.add("Ctrl+Shift+N",function() { robot.moveTo("NORTH");});
+    shortcut.add("Ctrl+Shift+S",function() { robot.moveTo("SOUTH");});
+    shortcut.add("Ctrl+Shift+W",function() { robot.moveTo("WEST");});
+    shortcut.add("Ctrl+Shift+E",function() { robot.moveTo("EAST");});
   });
 </script>
 </body>
